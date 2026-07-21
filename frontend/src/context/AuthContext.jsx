@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext(null);
 
 const STORAGE_KEY = "finoxyra_auth";
+const API_BASE = "http://localhost:8081/api/auth";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -20,32 +21,40 @@ export function AuthProvider({ children }) {
     setInitializing(false);
   }, []);
 
-  // NOTE: mock implementation. Once the backend Auth module is live at
-  // /api/auth/register and /api/auth/login, replace the body of these two
-  // functions with real fetch() calls that return { token, fullName, email, role }.
   async function register({ fullName, email, password }) {
-    await new Promise((r) => setTimeout(r, 500));
-    if (!fullName || !email || !password) {
-      throw new Error("All fields are required");
+    const res = await fetch(`${API_BASE}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Registration failed. Try again.");
     }
-    if (password.length < 6) {
-      throw new Error("Password must be at least 6 characters");
-    }
-    const fakeUser = { fullName, email, role: "USER", token: "mock-token-" + Date.now() };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(fakeUser));
-    setUser(fakeUser);
-    return fakeUser;
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setUser(data);
+    return data;
   }
 
   async function login({ email, password }) {
-    await new Promise((r) => setTimeout(r, 500));
-    if (!email || !password) {
-      throw new Error("Email and password are required");
+    const res = await fetch(`${API_BASE}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Invalid email or password.");
     }
-    const fakeUser = { fullName: email.split("@")[0], email, role: "USER", token: "mock-token-" + Date.now() };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(fakeUser));
-    setUser(fakeUser);
-    return fakeUser;
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setUser(data);
+    return data;
   }
 
   function logout() {
