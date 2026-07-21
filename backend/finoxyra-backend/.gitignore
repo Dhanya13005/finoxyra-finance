@@ -1,0 +1,14 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.vscode/
+.factorypath
+.idea/
+*.iws
+*.iml
+*.ipr
+.DS_Store
+Thumbs.db
+application-local.properties
