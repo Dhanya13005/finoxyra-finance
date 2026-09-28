@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext(null);
 
 const STORAGE_KEY = "finoxyra_auth";
-const API_BASE = "http://localhost:8081/api/auth";
+const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:8081"}/api/auth`;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
